@@ -1,10 +1,9 @@
-import { View, StyleSheet, Alert, Text } from 'react-native';
+import { View, StyleSheet, Alert, Text, Image } from 'react-native';
 import {
   launchCameraAsync,
   useCameraPermissions,
   PermissionStatus,
 } from 'expo-image-picker';
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
 import Button from '../ui/Button';
 import { useState } from 'react';
@@ -40,16 +39,7 @@ const ImagePicker = () => {
       quality: 0.5,
     });
     if (!result.canceled) {
-      // dummy fixing ImagePicker bug in EXPO SDK46
-      // TODO remove this bugfix with next EXPO SDK release
-      const manipResult  = await manipulateAsync(
-        result.uri,
-        [],
-        {}
-      );
-      //end of dummy fix...
-      console.log(manipResult.uri);
-      setImageURI(manipResult.uri);
+      setImageURI(result.assets[0].uri);
     }
   }
 
