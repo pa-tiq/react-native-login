@@ -1,11 +1,13 @@
 import { View, StyleSheet, Alert, Text, Image } from 'react-native';
 import {
+  launchImageLibraryAsync,
   launchCameraAsync,
   useCameraPermissions,
   PermissionStatus,
+  MediaTypeOptions,
 } from 'expo-image-picker';
 
-import Button from '../ui/Button';
+import IconTextButton from '../ui/IconTextButton';
 import { useState } from 'react';
 import { Colors } from '../../constants/styles';
 
@@ -41,6 +43,20 @@ const ImagePicker = () => {
     if (!result.canceled) {
       setImageURI(result.assets[0].uri);
     }
+  }  
+  
+  async function getFileHandler() {
+    const hasPermission = await verifyPermissions();
+    if (!hasPermission) return;
+    const result = await launchImageLibraryAsync({
+      mediaTypes: MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 0.5,
+    });
+    if (!result.canceled) {
+      setImageURI(result.assets[0].uri);
+    }
   }
 
   let imagePreview = <Text>No image taken yet.</Text>;
@@ -52,7 +68,14 @@ const ImagePicker = () => {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.imagePreview}>{imagePreview}</View>
-      <Button onPress={takeImageHandler}>Take Image</Button>
+      <View style={styles.imageButtonsContainer}>
+        <IconTextButton icon='camera' onPress={takeImageHandler}>
+          Take Image
+        </IconTextButton>
+        <IconTextButton icon='document' onPress={getFileHandler}>
+          Upload File
+        </IconTextButton>
+      </View>
     </View>
   );
 };
@@ -63,7 +86,7 @@ const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   imagePreview: {
     width: '100%',
@@ -79,4 +102,7 @@ const styles = StyleSheet.create({
     height: '100%',
     marginVertical: 8,
   },
+  imageButtonsContainer:{
+    flexDirection:'row',
+  }
 });
