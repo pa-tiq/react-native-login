@@ -11,6 +11,8 @@ import AuthContextProvider, { AuthContext } from './store/auth-context';
 import { useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingOverlay from './components/ui/LoadingOverlay';
+import AllPlaces from './screens/AllPlaces';
+import AddPlace from './screens/AddPlace';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +20,7 @@ function AuthStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: Colors.primary500 },
+        headerStyle: { backgroundColor: Colors.primary700 },
         headerTintColor: 'white',
         contentStyle: { backgroundColor: Colors.primary100 },
       }}
@@ -32,19 +34,38 @@ function AuthStack() {
 function AuthenticatedStack() {
   const authContext = useContext(AuthContext);
 
+  const welcomeStackScreen = (
+    <Stack.Screen
+      name='Welcome'
+      component={WelcomeScreen}
+      options={{
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon='exit'
+            color={tintColor}
+            size={24}
+            onPress={authContext.logout}
+          />
+        ),
+      }}
+    />
+  );
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: { backgroundColor: Colors.primary500 },
+        headerStyle: { backgroundColor: Colors.primary700 },
         headerTintColor: 'white',
         contentStyle: { backgroundColor: Colors.primary100 },
       }}
     >
       <Stack.Screen
-        name='Welcome'
-        component={WelcomeScreen}
-        options={{
-          headerRight: ({ tintColor }) => (
+        name='AllPlaces'
+        component={AllPlaces}
+        options={({ navigation }) => ({
+          title: 'Your Favorite Places',
+          headerTitleAlign: 'center',
+          headerLeft: ({ tintColor }) => (
             <IconButton
               icon='exit'
               color={tintColor}
@@ -52,7 +73,20 @@ function AuthenticatedStack() {
               onPress={authContext.logout}
             />
           ),
-        }}
+          headerRight: ({ tintColor }) => (
+            <IconButton
+              icon='add'
+              color={tintColor}
+              size={24}
+              onPress={() => navigation.navigate('AddPlace')}
+            />
+          ),
+        })}
+      />
+      <Stack.Screen
+        name='AddPlace'
+        component={AddPlace}
+        options={{ title: 'Add a new Place', headerTitleAlign: 'center' }}
       />
     </Stack.Navigator>
   );
@@ -61,19 +95,19 @@ function AuthenticatedStack() {
 function Navigation() {
   const [isLoading, setIsLoading] = useState(true);
   const authContext = useContext(AuthContext);
-  useEffect(()=>{
-    async function fetchToken(){
+  useEffect(() => {
+    async function fetchToken() {
       const storedToken = await AsyncStorage.getItem('token');
-      if(storedToken){
+      if (storedToken) {
         authContext.authenticate(storedToken);
       }
       setIsLoading(false);
     }
     fetchToken();
-  },[]);
+  }, []);
 
-  if(isLoading){
-    return <LoadingOverlay/>;
+  if (isLoading) {
+    return <LoadingOverlay />;
   }
 
   return (
@@ -85,9 +119,6 @@ function Navigation() {
 }
 
 export default function App() {
-
-
-
   return (
     <>
       <StatusBar style='light' />

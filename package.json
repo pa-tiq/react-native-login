@@ -20,7 +20,9 @@
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
     "react-native-web": "~0.18.7",
-    "expo-app-loading": "~2.1.1"
+    "expo-app-loading": "~2.1.1",
+    "expo-image-picker": "~14.0.2",
+    "expo-image-manipulator": "~11.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3"
