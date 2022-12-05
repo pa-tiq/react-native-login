@@ -15,15 +15,16 @@
     "@react-navigation/native-stack": "^6.5.0",
     "axios": "^1.2.0",
     "expo": "^47.0.8",
+    "expo-app-loading": "~2.1.1",
+    "expo-file-system": "~15.1.1",
+    "expo-image-manipulator": "~11.0.0",
+    "expo-image-picker": "~14.0.2",
+    "expo-location": "~15.0.1",
     "expo-status-bar": "~1.4.2",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
-    "react-native-web": "~0.18.7",
-    "expo-app-loading": "~2.1.1",
-    "expo-image-picker": "~14.0.2",
-    "expo-image-manipulator": "~11.0.0",
-    "expo-location": "~15.0.1"
+    "react-native-web": "~0.18.7"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3"

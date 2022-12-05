@@ -3,6 +3,7 @@ import {
   launchImageLibraryAsync,
   launchCameraAsync,
   useCameraPermissions,
+  useMediaLibraryPermissions,
   PermissionStatus,
   MediaTypeOptions,
 } from 'expo-image-picker';
@@ -13,13 +14,15 @@ import { Colors } from '../../constants/styles';
 
 const ImagePicker = () => {
   const [imageURI, setImageURI] = useState(null);
-  const [cameraPermissionInformation, requestPermission] =
-    useCameraPermissions();
+  const [cameraPermissionInformation, requestCameraPermission] =
+    useCameraPermissions();  
+  const [libraryPermissionInformation, requestLibraryPermission] =
+  useMediaLibraryPermissions();
 
   // needed only for iOS
-  async function verifyPermissions() {
+  async function verifyCameraPermissions() {
     if (cameraPermissionInformation.status === PermissionStatus.UNDETERMINED) {
-      const permissionResponse = await requestPermission();
+      const permissionResponse = await requestCameraPermission();
       return permissionResponse.granted;
     }
     if (cameraPermissionInformation.status === PermissionStatus.DENIED) {
@@ -30,10 +33,25 @@ const ImagePicker = () => {
       return false;
     }
     return true;
+  }  
+  
+  async function verifyLibraryPermissions() {
+    if (libraryPermissionInformation.status === PermissionStatus.UNDETERMINED) {
+      const permissionResponse = await requestLibraryPermission();
+      return permissionResponse.granted;
+    }
+    if (libraryPermissionInformation.status === PermissionStatus.DENIED) {
+      Alert.alert(
+        'Sem permissão!',
+        'vc precisa permitir o app a acessar seus arquivos'
+      );
+      return false;
+    }
+    return true;
   }
 
   async function takeImageHandler() {
-    const hasPermission = await verifyPermissions();
+    const hasPermission = await verifyCameraPermissions();
     if (!hasPermission) return;
     const result = await launchCameraAsync({
       allowsEditing: true,
@@ -46,7 +64,7 @@ const ImagePicker = () => {
   }  
   
   async function getFileHandler() {
-    const hasPermission = await verifyPermissions();
+    const hasPermission = await verifyLibraryPermissions();
     if (!hasPermission) return;
     const result = await launchImageLibraryAsync({
       mediaTypes: MediaTypeOptions.Images,

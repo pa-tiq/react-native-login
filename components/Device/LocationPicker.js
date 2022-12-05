@@ -1,17 +1,27 @@
-import { View, StyleSheet, Text, Alert} from 'react-native';
-import { getCurrentPositionAsync, useForegroundPermissions, PermissionStatus } from 'expo-location';
+import { View, StyleSheet, Text, Alert, Image } from 'react-native';
+import {
+  getCurrentPositionAsync,
+  useForegroundPermissions,
+  PermissionStatus,
+} from 'expo-location';
 import IconTextButton from '../ui/IconTextButton';
 import { Colors } from '../../constants/styles';
 import { useState } from 'react';
+import { getMap } from '../../util/map';
+import LoadingOverlay from '../ui/LoadingOverlay';
 
 const LocationPicker = () => {
-  const [location, setLocation] = useState(null);
+  const [imageZoom, setImageZoom] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [locationURI, setLocationURI] = useState(null);
   const [locationPermissionInformation, requestPermission] =
-  useForegroundPermissions();
+    useForegroundPermissions();
 
   // needed for Android & iOS
   async function verifyPermissions() {
-    if (locationPermissionInformation.status === PermissionStatus.UNDETERMINED) {
+    if (
+      locationPermissionInformation.status === PermissionStatus.UNDETERMINED
+    ) {
       const permissionResponse = await requestPermission();
       return permissionResponse.granted;
     }
@@ -28,16 +38,33 @@ const LocationPicker = () => {
   async function getLocationHandler() {
     const hasPermission = await verifyPermissions();
     if (!hasPermission) return;
+    setIsLoading(true);
     const location = await getCurrentPositionAsync();
-    console.log(location);
+    const uri = await getMap(
+      location.coords.latitude,
+      location.coords.longitude
+    );
+    setIsLoading(false);
+    setLocationURI(uri);
   }
 
-  function pickOnMapHandler() {}
+  const imageZoomHandler = () => {
+    setImageZoom((previousValue) => !previousValue);
+  };
 
   let locationPreview = <Text>No location chosen yet.</Text>;
 
-  if (location) {
-    locationPreview = <Text>Oieeeee</Text>;
+  if (isLoading) {
+    locationPreview = <LoadingOverlay />;
+  }
+
+  if (locationURI && !isLoading) {
+    locationPreview = (
+      <Image
+        style={imageZoom ? styles.imageZoom : styles.image}
+        source={{ uri: locationURI }}
+      />
+    );
   }
 
   return (
@@ -46,9 +73,6 @@ const LocationPicker = () => {
       <View style={styles.locationButtonsContainer}>
         <IconTextButton icon='location' onPress={getLocationHandler}>
           Locate User
-        </IconTextButton>
-        <IconTextButton icon='map' onPress={pickOnMapHandler}>
-          Pick On Map
         </IconTextButton>
       </View>
     </View>
@@ -63,7 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
   },
-  mapPreview:{
+  mapPreview: {
     width: '100%',
     height: 200,
     marginVertical: 8,
@@ -71,6 +95,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary50,
     borderRadius: 4,
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+    marginVertical: 8,
+  },
+  imageZoom: {
+    width: '200%',
+    height: '200%',
+    marginVertical: 8,
   },
   locationButtonsContainer: {
     flexDirection: 'row',
