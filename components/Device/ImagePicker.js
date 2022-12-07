@@ -12,7 +12,7 @@ import IconTextButton from '../ui/IconTextButton';
 import { useState } from 'react';
 import { Colors } from '../../constants/styles';
 
-const ImagePicker = () => {
+const ImagePicker = (props) => {
   const [imageURI, setImageURI] = useState(null);
   const [cameraPermissionInformation, requestCameraPermission] =
     useCameraPermissions();  
@@ -60,6 +60,7 @@ const ImagePicker = () => {
     });
     if (!result.canceled) {
       setImageURI(result.assets[0].uri);
+      props.onImageTaken(result.assets[0].uri);
     }
   }  
   
@@ -74,6 +75,7 @@ const ImagePicker = () => {
     });
     if (!result.canceled) {
       setImageURI(result.assets[0].uri);
+      props.onImageTaken(result.assets[0].uri);
     }
   }
 
@@ -114,6 +116,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary50,
     borderRadius: 4,
+    overflow:'hidden'
   },
   image: {
     width: '100%',

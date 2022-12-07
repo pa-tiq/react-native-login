@@ -10,7 +10,7 @@ import { useState } from 'react';
 import { getMap } from '../../util/map';
 import LoadingOverlay from '../ui/LoadingOverlay';
 
-const LocationPicker = () => {
+const LocationPicker = (props) => {
   const [imageZoom, setImageZoom] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [locationURI, setLocationURI] = useState('');
@@ -46,8 +46,9 @@ const LocationPicker = () => {
       locationURI
     );
     setIsLoading(false);
-    console.log('location uri:' + uri);
+    //console.log('location uri:' + uri);
     setLocationURI(uri);
+    props.onLocationPicked(uri);
   }
 
   const imageZoomHandler = () => {
@@ -97,6 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary50,
     borderRadius: 4,
+    overflow:'hidden'
   },
   image: {
     width: '100%',
@@ -110,5 +112,6 @@ const styles = StyleSheet.create({
   },
   locationButtonsContainer: {
     flexDirection: 'row',
+    marginBottom:8
   },
 });
