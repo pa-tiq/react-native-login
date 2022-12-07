@@ -13,7 +13,7 @@ import LoadingOverlay from '../ui/LoadingOverlay';
 const LocationPicker = () => {
   const [imageZoom, setImageZoom] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [locationURI, setLocationURI] = useState(null);
+  const [locationURI, setLocationURI] = useState('');
   const [locationPermissionInformation, requestPermission] =
     useForegroundPermissions();
 
@@ -42,9 +42,11 @@ const LocationPicker = () => {
     const location = await getCurrentPositionAsync();
     const uri = await getMap(
       location.coords.latitude,
-      location.coords.longitude
+      location.coords.longitude,
+      locationURI
     );
     setIsLoading(false);
+    console.log('location uri:' + uri);
     setLocationURI(uri);
   }
 
@@ -58,7 +60,7 @@ const LocationPicker = () => {
     locationPreview = <LoadingOverlay />;
   }
 
-  if (locationURI && !isLoading) {
+  if (locationURI.length > 0 && !isLoading) {
     locationPreview = (
       <Image
         style={imageZoom ? styles.imageZoom : styles.image}

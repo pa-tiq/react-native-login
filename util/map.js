@@ -1,28 +1,48 @@
-import { createDownloadResumable, documentDirectory, getContentUriAsync} from 'expo-file-system';
+import {
+  createDownloadResumable,
+  documentDirectory,
+  getInfoAsync,
+} from 'expo-file-system';
+
+const URI_image =
+  'file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540anonymous%252FRNCourse-7837b07c-6635-43e2-9c07-e9a615bceacf/location.png';
+const sample_OpenStreetMap_URL_image = `https://render.openstreetmap.org/cgi-bin/export?bbox=
+-60.07906579971314,-3.0897065363048823,-60.06785663928902,-3.0826872324161205
+&scale=8639&format=png`;
+
+const sample_image_URL = 'http://techslides.com/demos/samples/sample.png';
 
 const URL_image = 'https://render.openstreetmap.org/cgi-bin/export?bbox=';
-const URI_image = 'file:///data/user/0/host.exp.exponent/files/ExperienceData/%2540anonymous%252FRNCourse-7837b07c-6635-43e2-9c07-e9a615bceacf/location.png'
 
-export async function getMap(latitude, longitude) {
-  
-  try{
-    const fileExists = await getContentUriAsync(URI_image);
-    if(fileExists) return URI_image;
-  } catch (e) {
-    console.error(e);
-  }   
+export async function getMap(latitude, longitude, location) {
+  if (location.length > 0) {
+    console.log('stored file location: ', location);
+    try {
+      const file = await getInfoAsync(location);
+      if (file.exists) return location;
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   let location_image_uri;
   const url =
-    URL_image +
-    `${longitude - 0.02},${latitude - 0.01},${longitude + 0.02},
-    ${latitude + 0.01}&scale=8639&format=png`;
-  
+    sample_image_URL +
+    `${(longitude - 0.02).toFixed(14)},${(latitude - 0.01).toFixed(16)},` +
+    `${(longitude + 0.02).toFixed(14)},${(latitude + 0.01).toFixed(16)}` +
+    '&scale=8639&format=png';
+
   const downloadResumable = createDownloadResumable(
     url,
-    documentDirectory + 'location.png',
-    {}
+    documentDirectory + `location1.png`,
+    {
+      headers: {
+        'user-agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+      },
+    }
   );
+  console.log('Download URL: ', url);
 
   try {
     const { uri } = await downloadResumable.downloadAsync();
@@ -30,6 +50,6 @@ export async function getMap(latitude, longitude) {
     location_image_uri = uri;
   } catch (e) {
     console.error(e);
-  }   
+  }
   return location_image_uri;
 }
