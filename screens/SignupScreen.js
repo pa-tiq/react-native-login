@@ -5,7 +5,7 @@ import LoadingOverlay from '../components/ui/LoadingOverlay';
 import { AuthContext } from '../store/auth-context';
 import { createUser } from '../util/auth';
 
-function SignupScreen({ navigation }) {
+function SignupScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const authContext = useContext(AuthContext);
 
@@ -18,7 +18,6 @@ function SignupScreen({ navigation }) {
       setIsLoading(false);
       return;
     }
-    navigation.navigate('Login');
   }
 
   if (isLoading) {
