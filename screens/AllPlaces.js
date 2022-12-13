@@ -1,6 +1,6 @@
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import PlacesList from '../components/Places/PlacesList';
 import { fetchPlaces } from '../util/database';
 
