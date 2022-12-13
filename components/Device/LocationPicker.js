@@ -48,7 +48,10 @@ const LocationPicker = (props) => {
     setIsLoading(false);
     //console.log('location uri:' + uri);
     setLocationURI(uri);
-    props.onLocationPicked(uri);
+    props.onLocationPicked({
+      lat: location.coords.latitude,
+      long: location.coords.longitude,
+    });
   }
 
   const imageZoomHandler = () => {
@@ -98,7 +101,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.primary50,
     borderRadius: 4,
-    overflow:'hidden'
+    overflow: 'hidden',
   },
   image: {
     width: '100%',
@@ -112,6 +115,6 @@ const styles = StyleSheet.create({
   },
   locationButtonsContainer: {
     flexDirection: 'row',
-    marginBottom:8
+    marginBottom: 8,
   },
 });

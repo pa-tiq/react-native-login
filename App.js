@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-
 import IconButton from './components/ui/IconButton';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
@@ -13,6 +12,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoadingOverlay from './components/ui/LoadingOverlay';
 import AllPlaces from './screens/AllPlaces';
 import AddPlace from './screens/AddPlace';
+import { init } from './util/database';
+import PlaceDetails from './screens/PlaceDetails';
 
 const Stack = createNativeStackNavigator();
 
@@ -63,7 +64,7 @@ function AuthenticatedStack() {
         name='AllPlaces'
         component={AllPlaces}
         options={({ navigation }) => ({
-          title: 'Your Favorite Places',
+          title: 'Lista Caralhuda',
           headerTitleAlign: 'center',
           headerLeft: ({ tintColor }) => (
             <IconButton
@@ -87,6 +88,11 @@ function AuthenticatedStack() {
         name='AddPlace'
         component={AddPlace}
         options={{ title: 'Add a new Place', headerTitleAlign: 'center' }}
+      />
+      <Stack.Screen
+        name='PlaceDetails'
+        component={PlaceDetails}
+        options={{ title: 'Loading Place...', headerTitleAlign: 'center' }}
       />
     </Stack.Navigator>
   );
@@ -119,6 +125,20 @@ function Navigation() {
 }
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    init()
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  if (isLoading) {
+    return <LoadingOverlay />;
+  }
+
   return (
     <>
       <StatusBar style='light' />

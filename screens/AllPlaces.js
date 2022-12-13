@@ -1,18 +1,30 @@
+import { useIsFocused } from '@react-navigation/native';
+import { useEffect, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import PlacesList from '../components/Places/PlacesList';
+import { fetchPlaces } from '../util/database';
 
 const AllPlaces = () => {
-  return (
-    <PlacesList/>
-  );
+  const [loadedPlaces, setLoadedPlaces] = useState([]);
+  const isFocused = useIsFocused();
+  useEffect(() => {
+    async function loadPlaces(){
+      const places = await fetchPlaces();
+      setLoadedPlaces(places);
+    }
+    if (isFocused) {
+      loadPlaces();
+    }
+  }, [isFocused]);
+  return <PlacesList places={loadedPlaces}/>;
 };
 
 export default AllPlaces;
 
 const styles = StyleSheet.create({
   rootContainer: {
-    flex:1,
+    flex: 1,
     justifyContent: 'center',
-    alignItems:'center',
-  }
+    alignItems: 'center',
+  },
 });
