@@ -25,12 +25,13 @@ const ImagePicker = (props) => {
       const permissionResponse = await requestCameraPermission();
       return permissionResponse.granted;
     }
-    if (cameraPermissionInformation.status === PermissionStatus.DENIED) {
+    else if (cameraPermissionInformation.status === PermissionStatus.DENIED) {
       Alert.alert(
         'Sem permissão!',
-        'vc precisa permitir o app a usar a sua câmera'
+        'vc precisa permitir o app a usar a sua câmera.'
       );
-      return false;
+      const permissionResponse = await requestCameraPermission();
+      return permissionResponse.granted;
     }
     return true;
   }  
@@ -40,12 +41,13 @@ const ImagePicker = (props) => {
       const permissionResponse = await requestLibraryPermission();
       return permissionResponse.granted;
     }
-    if (libraryPermissionInformation.status === PermissionStatus.DENIED) {
+    else if (libraryPermissionInformation.status === PermissionStatus.DENIED) {
       Alert.alert(
         'Sem permissão!',
-        'vc precisa permitir o app a acessar seus arquivos'
+        'vc precisa permitir o app a acessar seus arquivos.'
       );
-      return false;
+      const permissionResponse = await requestLibraryPermission();
+      return permissionResponse.granted;
     }
     return true;
   }

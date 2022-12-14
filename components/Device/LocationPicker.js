@@ -25,12 +25,13 @@ const LocationPicker = (props) => {
       const permissionResponse = await requestPermission();
       return permissionResponse.granted;
     }
-    if (locationPermissionInformation.status === PermissionStatus.DENIED) {
+    else if (locationPermissionInformation.status === PermissionStatus.DENIED) {
       Alert.alert(
         'Sem permissão!',
-        'vc precisa permitir o app a usar a sua localização'
+        'vc precisa permitir o app a usar a sua localização.'
       );
-      return false;
+      const permissionResponse = await requestPermission();
+      return permissionResponse.granted;
     }
     return true;
   }

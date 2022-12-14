@@ -7,6 +7,7 @@ import { fetchPlaces } from '../util/database';
 const AllPlaces = () => {
   const [loadedPlaces, setLoadedPlaces] = useState([]);
   const isFocused = useIsFocused();
+  
   useEffect(() => {
     async function loadPlaces(){
       const places = await fetchPlaces();

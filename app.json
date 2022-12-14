@@ -34,6 +34,13 @@
         {
           "cameraPermission": "Me dá acesso à sua câmera pra eu ficar te espiando, seu gostoso"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./local/assets/notification-icon.png",
+          "color": "#ffffff"
+        }
       ]
     ]
   }

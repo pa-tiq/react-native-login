@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import IconButton from './components/ui/IconButton';
@@ -14,6 +14,7 @@ import AllPlaces from './screens/AllPlaces';
 import AddPlace from './screens/AddPlace';
 import { init } from './util/database';
 import PlaceDetails from './screens/PlaceDetails';
+import * as Notifications from 'expo-notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,25 @@ function AuthStack() {
 
 function AuthenticatedStack() {
   const authContext = useContext(AuthContext);
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const notificationGenerationListener = Notifications.addNotificationReceivedListener((notification) => {
+      const placeId = notification.request.content.data.placeId;
+      //console.log('notification generated - placeId=',placeId);
+    });
+    const notificationUserInteractionListener = Notifications.addNotificationResponseReceivedListener((response)=>{
+      const placeId = response.notification.request.content.data.placeId;
+      //console.log('notification touched by user - placeId=',placeId);
+      navigation.navigate('PlaceDetails',{
+        placeId: placeId
+      });
+    })
+    return () => {
+      notificationGenerationListener.remove();
+      notificationUserInteractionListener.remove();
+    }
+  }, []);
 
   const welcomeStackScreen = (
     <Stack.Screen
@@ -123,6 +143,16 @@ function Navigation() {
     </NavigationContainer>
   );
 }
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    return {
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowAlert: true,
+    };
+  },
+});
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
