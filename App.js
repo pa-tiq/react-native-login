@@ -1,20 +1,24 @@
+import { useContext, useEffect, useState } from 'react';
+import { Alert, Platform } from 'react-native';
+
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { StatusBar } from 'expo-status-bar';
+import * as Notifications from 'expo-notifications';
+
+import LoadingOverlay from './components/ui/LoadingOverlay';
+import AllPlaces from './screens/AllPlaces';
+import AddPlace from './screens/AddPlace';
+import { init } from './util/database';
+import PlaceDetails from './screens/PlaceDetails';
 import IconButton from './components/ui/IconButton';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
 import WelcomeScreen from './screens/WelcomeScreen';
 import { Colors } from './constants/styles';
 import AuthContextProvider, { AuthContext } from './store/auth-context';
-import { useContext, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import LoadingOverlay from './components/ui/LoadingOverlay';
-import AllPlaces from './screens/AllPlaces';
-import AddPlace from './screens/AddPlace';
-import { init } from './util/database';
-import PlaceDetails from './screens/PlaceDetails';
-import * as Notifications from 'expo-notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,21 +42,23 @@ function AuthenticatedStack() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const notificationGenerationListener = Notifications.addNotificationReceivedListener((notification) => {
-      const placeId = notification.request.content.data.placeId;
-      //console.log('notification generated - placeId=',placeId);
-    });
-    const notificationUserInteractionListener = Notifications.addNotificationResponseReceivedListener((response)=>{
-      const placeId = response.notification.request.content.data.placeId;
-      //console.log('notification touched by user - placeId=',placeId);
-      navigation.navigate('PlaceDetails',{
-        placeId: placeId
+    const notificationGenerationListener =
+      Notifications.addNotificationReceivedListener((notification) => {
+        const placeId = notification.request.content.data.placeId;
+        //console.log('notification generated - placeId=',placeId);
       });
-    })
+    const notificationUserInteractionListener =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const placeId = response.notification.request.content.data.placeId;
+        //console.log('notification touched by user - placeId=',placeId);
+        navigation.navigate('PlaceDetails', {
+          placeId: placeId,
+        });
+      });
     return () => {
       notificationGenerationListener.remove();
       notificationUserInteractionListener.remove();
-    }
+    };
   }, []);
 
   const welcomeStackScreen = (
@@ -156,6 +162,32 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    async function configurePushNotifications() {
+      const { status } = await Notifications.getPermissionsAsync();
+      let finalStatus = status;
+      if (finalStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        Alert.alert(
+          'Permissão necessária',
+          'Notificações push precisam de permissão.'
+        );
+        return;
+      }
+      const pushTokenData = Notifications.getExpoPushTokenAsync();
+      console.log(pushTokenData);
+      if (Platform.OS === 'android') {
+        Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.DEFAULT,
+        });
+      }
+    }
+    configurePushNotifications();
+  }, []);
   useEffect(() => {
     init()
       .then(() => {

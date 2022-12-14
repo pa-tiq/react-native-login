@@ -8,7 +8,6 @@ const AddPlace = ({ navigation }) => {
 
   async function createPlaceHandler(place) {
     const insertedPlace = await insertPlace(place);
-    console.log(insertedPlace);
     Notifications.scheduleNotificationAsync({
       content: {
         title: 'Oieeeeee',
