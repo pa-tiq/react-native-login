@@ -1,28 +1,49 @@
 import { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, Image } from 'react-native';
+import { View, StyleSheet, Text, ScrollView, Image, Alert } from 'react-native';
+import IconButton from '../components/ui/IconButton';
 import IconTextButton from '../components/ui/IconTextButton';
 import LoadingOverlay from '../components/ui/LoadingOverlay';
 import { Colors } from '../constants/styles';
-import { fetchPlaceDetails } from '../util/database';
+import { deletePlace, fetchPlaceDetails } from '../util/database';
 
 const PlaceDetails = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchedPlace, setFetchedPlace] = useState();
-  const showOnMapHandler = () => {};
   const selectedPlaceId = route.params.placeId;
+
+  const showOnMapHandler = () => {};
+  const removePlaceHandler = async () => {
+    await deletePlace(selectedPlaceId)
+      .then(() => {
+        navigation.navigate('AllPlaces');
+      })
+      .catch((err) => {
+        Alert.alert('Remoção falhou!', 'não deu certo remover esse item.');
+      });
+  };
 
   useEffect(() => {
     async function loadPlaceData() {
       const place = await fetchPlaceDetails(selectedPlaceId);
       setFetchedPlace(place);
-      navigation.setOptions({ title: place.title });
+      navigation.setOptions({
+        title: place.title,
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon='trash'
+            color={tintColor}
+            size={24}
+            onPress={removePlaceHandler}
+          />
+        ),
+      });
       setIsLoading(false);
     }
     loadPlaceData();
   }, [selectedPlaceId]);
 
   if (isLoading) {
-    return <LoadingOverlay/>;
+    return <LoadingOverlay />;
   }
 
   return (

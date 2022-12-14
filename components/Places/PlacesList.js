@@ -7,7 +7,7 @@ const PlacesList = ({ places }) => {
   function selectPlaceHandler(id) {
     navigation.navigate('PlaceDetails',{
       placeId: id
-    })
+    });
   }
   if (!places || places.length === 0) {
     return (
